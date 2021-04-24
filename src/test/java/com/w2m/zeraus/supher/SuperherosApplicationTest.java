@@ -9,7 +9,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -19,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.w2m.zeraus.supher.service.model.SuperheroVO;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(classes = SuperherosApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 class SuperherosApplicationTest {
 
@@ -29,6 +33,7 @@ class SuperherosApplicationTest {
 	private TestRestTemplate restTemplate;
 
 	@Test
+	@Order(1)
 	void findAllTest() {
 		ResponseEntity<SuperheroVO[]> response = restTemplate.getForEntity("http://localhost:" + port + "/superheros",
 				SuperheroVO[].class);
@@ -37,6 +42,7 @@ class SuperherosApplicationTest {
 	}
 
 	@Test
+	@Order(2)
 	void findByIdTest() {
 		Long id = 3L;
 
@@ -47,6 +53,7 @@ class SuperherosApplicationTest {
 	}
 
 	@Test
+	@Order(3)
 	void findByNameTest() {
 		String name = "ana";
 
@@ -57,6 +64,7 @@ class SuperherosApplicationTest {
 	}
 
 	@Test
+	@Order(4)
 	void updateTest() {
 		Long id = 3L;
 		ResponseEntity<SuperheroVO> supher = restTemplate.getForEntity("http://localhost:" + port + "/superhero/" + id,
@@ -75,11 +83,12 @@ class SuperherosApplicationTest {
 	}
 
 	@Test
+	@Order(5)
 	void deleteByIdTest() {
 		Long id = 3L;
 		restTemplate.delete("http://localhost:" + port + "/superhero/" + id);
 
-		ResponseEntity<SuperheroVO> response = restTemplate.getForEntity("http://localhost:" + port + "/superheros/" + id,
+		ResponseEntity<SuperheroVO> response = restTemplate.getForEntity("http://localhost:" + port + "/superhero/" + id,
 				SuperheroVO.class);
 
 		assertNull(response.getBody());
