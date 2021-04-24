@@ -1,10 +1,10 @@
 package com.w2m.zeraus.supher.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,58 +15,62 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.w2m.zeraus.supher.model.Superhero;
+import com.w2m.zeraus.supher.service.SuperherosService;
 
 @RestController
 public class SuperherosController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SuperherosController.class);
-	
+
+	@Autowired
+	private SuperherosService superherosService;
+
 	@GetMapping(value = "/superheros", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<Superhero> findAll() {
+		LOGGER.trace("START - findAll");
 
-		List<Superhero> supherList = new ArrayList<>();
+		List<Superhero> response = superherosService.findAll();
 
-		Superhero supher1 = new Superhero(1L, "Spiderman", "M");
-		supherList.add(supher1);
-
-		Superhero supher2 = new Superhero(2L, "Capitana Marvel", "F");
-		supherList.add(supher2);
-
-		Superhero supher3 = new Superhero(3L, "Aquaman", "M");
-		supherList.add(supher3);
-
-		Superhero supher4 = new Superhero(4L, "Batgirl", "F");
-		supherList.add(supher4);
-
-		return supherList;
-
+		LOGGER.trace("END - findAll");
+		return response;
 	}
 
 	@GetMapping(path = "/superhero/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Superhero findById(@PathVariable("id") Long id) {
-		return new Superhero(3L, "Aquaman", "M");
+		LOGGER.trace("START - findById");
+
+		Superhero response = superherosService.findById(id);
+
+		LOGGER.trace("END - findById");
+		return response;
 	}
 
 	@GetMapping(path = "/superhero", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<Superhero> findByName(@RequestParam("name") String name) {
-		List<Superhero> supherList = new ArrayList<>();
+		LOGGER.trace("START - findByName");
 
-		Superhero supher = new Superhero(2L, "Capitana Marvel", "F");
-		supherList.add(supher);
+		List<Superhero> response = superherosService.findByName(name);
 
-		return supherList;
+		LOGGER.trace("END - findByName");
+		return response;
 	}
 
 	@PutMapping(value = "/superhero", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public void update(@RequestBody Superhero supher) {
-		LOGGER.info("update");
-		// Do nothing
+		LOGGER.trace("START - update");
+
+		superherosService.update(supher);
+
+		LOGGER.trace("END - update");
 	}
 
 	@DeleteMapping(value = "/superhero/{id}")
 	public void deleteById(@PathVariable(value = "id") Long id) {
-		LOGGER.info("delete");
-		// Do nothing
+		LOGGER.trace("START - deleteById");
+
+		superherosService.deleteById(id);
+
+		LOGGER.trace("END - deleteById");
 	}
 
 }
