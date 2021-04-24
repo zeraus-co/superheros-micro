@@ -2,17 +2,17 @@ package com.w2m.zeraus.supher.service;
 
 import java.util.List;
 
-import com.w2m.zeraus.supher.model.Superhero;
+import com.w2m.zeraus.supher.service.model.SuperheroVO;
 
 public interface SuperherosService {
 
-	public List<Superhero> findAll();
+	public List<SuperheroVO> findAll();
 
-	public Superhero findById(Long id);
+	public SuperheroVO findById(Long id);
 
-	public List<Superhero> findByName(String name);
+	public List<SuperheroVO> findByName(String name);
 
-	public void update(Superhero supher);
+	public void update(SuperheroVO supher);
 
 	public void deleteById(Long id);
 

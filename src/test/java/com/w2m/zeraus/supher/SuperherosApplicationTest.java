@@ -17,7 +17,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.ResponseEntity;
 
-import com.w2m.zeraus.supher.model.Superhero;
+import com.w2m.zeraus.supher.service.model.SuperheroVO;
 
 @SpringBootTest(classes = SuperherosApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 class SuperherosApplicationTest {
@@ -30,8 +30,8 @@ class SuperherosApplicationTest {
 
 	@Test
 	void findAllTest() {
-		ResponseEntity<Superhero[]> response = restTemplate.getForEntity("http://localhost:" + port + "/superheros",
-				Superhero[].class);
+		ResponseEntity<SuperheroVO[]> response = restTemplate.getForEntity("http://localhost:" + port + "/superheros",
+				SuperheroVO[].class);
 
 		assertEquals(4, Arrays.asList(response.getBody()).size());
 	}
@@ -40,8 +40,8 @@ class SuperherosApplicationTest {
 	void findByIdTest() {
 		Long id = 3L;
 
-		ResponseEntity<Superhero> response = restTemplate.getForEntity("http://localhost:" + port + "/superhero/" + id,
-				Superhero.class);
+		ResponseEntity<SuperheroVO> response = restTemplate.getForEntity("http://localhost:" + port + "/superhero/" + id,
+				SuperheroVO.class);
 
 		assertEquals(id, response.getBody().getId());
 	}
@@ -50,8 +50,8 @@ class SuperherosApplicationTest {
 	void findByNameTest() {
 		String name = "ana";
 
-		ResponseEntity<Superhero[]> response = restTemplate
-				.getForEntity("http://localhost:" + port + "/superhero?name=" + name, Superhero[].class);
+		ResponseEntity<SuperheroVO[]> response = restTemplate
+				.getForEntity("http://localhost:" + port + "/superhero?name=" + name, SuperheroVO[].class);
 
 		assertTrue(Arrays.asList(response.getBody()).get(0).getName().contains(name));
 	}
@@ -59,8 +59,8 @@ class SuperherosApplicationTest {
 	@Test
 	void updateTest() {
 		Long id = 3L;
-		ResponseEntity<Superhero> supher = restTemplate.getForEntity("http://localhost:" + port + "/superhero/" + id,
-				Superhero.class);
+		ResponseEntity<SuperheroVO> supher = restTemplate.getForEntity("http://localhost:" + port + "/superhero/" + id,
+				SuperheroVO.class);
 
 		supher.getBody().setName("Capitana");
 
@@ -68,8 +68,8 @@ class SuperherosApplicationTest {
 		params.put("id", "3");
 		restTemplate.put("http://localhost:" + port + "/superheros", supher, params);
 
-		ResponseEntity<Superhero> response = restTemplate.getForEntity("http://localhost:" + port + "/superhero/" + id,
-				Superhero.class);
+		ResponseEntity<SuperheroVO> response = restTemplate.getForEntity("http://localhost:" + port + "/superhero/" + id,
+				SuperheroVO.class);
 
 		assertEquals(id, response.getBody().getId());
 	}
@@ -79,8 +79,8 @@ class SuperherosApplicationTest {
 		Long id = 3L;
 		restTemplate.delete("http://localhost:" + port + "/superhero/" + id);
 
-		ResponseEntity<Superhero> response = restTemplate.getForEntity("http://localhost:" + port + "/superheros/" + id,
-				Superhero.class);
+		ResponseEntity<SuperheroVO> response = restTemplate.getForEntity("http://localhost:" + port + "/superheros/" + id,
+				SuperheroVO.class);
 
 		assertNull(response.getBody());
 	}

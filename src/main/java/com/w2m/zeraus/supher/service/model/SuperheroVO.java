@@ -1,8 +1,8 @@
-package com.w2m.zeraus.supher.model;
+package com.w2m.zeraus.supher.service.model;
 
 import java.io.Serializable;
 
-public class Superhero implements Serializable {
+public class SuperheroVO implements Serializable {
 
 	/** Attribute representing serialVersionUID */
 	private static final long serialVersionUID = -4865863289722011632L;
@@ -13,11 +13,11 @@ public class Superhero implements Serializable {
 
 	private String gender;
 
-	public Superhero() {
+	public SuperheroVO() {
 		super();
 	}
 
-	public Superhero(Long id, String name, String gender) {
+	public SuperheroVO(Long id, String name, String gender) {
 		this.id = id;
 		this.name = name;
 		this.gender = gender;

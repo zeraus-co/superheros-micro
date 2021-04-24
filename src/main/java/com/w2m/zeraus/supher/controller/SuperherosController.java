@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.w2m.zeraus.supher.model.Superhero;
 import com.w2m.zeraus.supher.service.SuperherosService;
+import com.w2m.zeraus.supher.service.model.SuperheroVO;
 
 @RestController
 public class SuperherosController {
@@ -26,37 +26,37 @@ public class SuperherosController {
 	private SuperherosService superherosService;
 
 	@GetMapping(value = "/superheros", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<Superhero> findAll() {
+	public List<SuperheroVO> findAll() {
 		LOGGER.trace("START - findAll");
 
-		List<Superhero> response = superherosService.findAll();
+		List<SuperheroVO> response = superherosService.findAll();
 
 		LOGGER.trace("END - findAll");
 		return response;
 	}
 
 	@GetMapping(path = "/superhero/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Superhero findById(@PathVariable("id") Long id) {
+	public SuperheroVO findById(@PathVariable("id") Long id) {
 		LOGGER.trace("START - findById");
 
-		Superhero response = superherosService.findById(id);
+		SuperheroVO response = superherosService.findById(id);
 
 		LOGGER.trace("END - findById");
 		return response;
 	}
 
 	@GetMapping(path = "/superhero", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<Superhero> findByName(@RequestParam("name") String name) {
+	public List<SuperheroVO> findByName(@RequestParam("name") String name) {
 		LOGGER.trace("START - findByName");
 
-		List<Superhero> response = superherosService.findByName(name);
+		List<SuperheroVO> response = superherosService.findByName(name);
 
 		LOGGER.trace("END - findByName");
 		return response;
 	}
 
 	@PutMapping(value = "/superhero", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public void update(@RequestBody Superhero supher) {
+	public void update(@RequestBody SuperheroVO supher) {
 		LOGGER.trace("START - update");
 
 		superherosService.update(supher);
