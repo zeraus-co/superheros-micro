@@ -1,13 +1,17 @@
 package com.w2m.zeraus.supher.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.w2m.zeraus.supher.entity.Superhero;
+import com.w2m.zeraus.supher.persistence.SuperherosDao;
 import com.w2m.zeraus.supher.service.SuperherosService;
+import com.w2m.zeraus.supher.service.mapper.SuperherosServiceMapper;
 import com.w2m.zeraus.supher.service.model.SuperheroVO;
 
 @Service
@@ -15,67 +19,64 @@ public class SuperherosServiceImpl implements SuperherosService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SuperherosServiceImpl.class);
 
+	@Autowired
+	private SuperherosDao superherosDao;
+
+	@Autowired
+	private SuperherosServiceMapper superherosServiceMapper;
+
 	@Override
 	public List<SuperheroVO> findAll() {
-		LOGGER.trace("START - findAll");
+		LOGGER.info("START - findAll");
 
-		List<SuperheroVO> supherList = new ArrayList<>();
+		List<SuperheroVO> response = superherosServiceMapper.transformToVO(superherosDao.findAll());
 
-		SuperheroVO supher1 = new SuperheroVO(1L, "Spiderman", "M");
-		supherList.add(supher1);
-
-		SuperheroVO supher2 = new SuperheroVO(2L, "Capitana Marvel", "F");
-		supherList.add(supher2);
-
-		SuperheroVO supher3 = new SuperheroVO(3L, "Aquaman", "M");
-		supherList.add(supher3);
-
-		SuperheroVO supher4 = new SuperheroVO(4L, "Batgirl", "F");
-		supherList.add(supher4);
-
-		LOGGER.trace("END - findAll");
-		return supherList;
+		LOGGER.info("END - findAll");
+		return response;
 	}
 
 	@Override
 	public SuperheroVO findById(Long id) {
-		LOGGER.trace("START - findById");
+		LOGGER.info("START - findById");
 
-		SuperheroVO response = new SuperheroVO(3L, "Aquaman", "M");
+		Optional<Superhero> superhero = superherosDao.findById(id);
 
-		LOGGER.trace("END - findById");
+		SuperheroVO response = null;
+
+		if (superhero.isPresent()) {
+			response = superherosServiceMapper.transformToVO(superhero.get());
+		}
+
+		LOGGER.info("END - findById");
 		return response;
 	}
 
 	@Override
 	public List<SuperheroVO> findByName(String name) {
-		LOGGER.trace("START - findByName");
+		LOGGER.info("START - findByName");
 
-		List<SuperheroVO> supherList = new ArrayList<>();
+		List<SuperheroVO> response = superherosServiceMapper.transformToVO(superherosDao.findByName(name));
 
-		SuperheroVO supher = new SuperheroVO(2L, "Capitana Marvel", "F");
-		supherList.add(supher);
-
-		LOGGER.trace("END - findByName");
-		return supherList;
+		LOGGER.info("END - findByName");
+		return response;
 	}
 
 	@Override
 	public void update(SuperheroVO supher) {
-		LOGGER.trace("START - update");
+		LOGGER.info("START - update");
 
-		// TODO Auto-generated method stub
+		superherosDao.save(superherosServiceMapper.transformToEntity(supher));
 
-		LOGGER.trace("END - update");
+		LOGGER.info("END - update");
 	}
 
 	@Override
 	public void deleteById(Long id) {
-		LOGGER.trace("START - deleteById");
+		LOGGER.info("START - deleteById");
 
-		// TODO Auto-generated method stub
+		superherosDao.deleteById(id);
 
-		LOGGER.trace("END - deleteById");
+		LOGGER.info("END - deleteById");
 	}
 
 }
