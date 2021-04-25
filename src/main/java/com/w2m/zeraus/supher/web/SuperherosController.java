@@ -32,6 +32,13 @@ import com.w2m.zeraus.supher.utils.Duration;
 import com.w2m.zeraus.supher.web.mapper.SuperherosControllerMapper;
 import com.w2m.zeraus.supher.web.model.SuperheroTO;
 
+/**
+ * 
+ * SuperherosController
+ * 
+ * @author employee zerausCo
+ *
+ */
 @RestController
 public class SuperherosController {
 
@@ -48,6 +55,18 @@ public class SuperherosController {
 	@Autowired
 	private SuperherosControllerMapper superherosControllerMapper;
 
+	/**
+	 * 
+	 * Method to find the superheroes. It has pagination and, by default, the size
+	 * of each page is 3 records.
+	 * 
+	 * @param pageNumber number of page.
+	 * @param pageSize   size of page
+	 * 
+	 * @return map of the result
+	 * 
+	 * @throws SuperheroException exception of type {@link SuperheroException}
+	 */
 	@Duration
 	@Cacheable(cacheNames = "suphercache", condition = "#pageNumber == 0")
 	@GetMapping(value = "/superheros", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -79,6 +98,14 @@ public class SuperherosController {
 				(supherList == null || supherList.isEmpty()) ? HttpStatus.NO_CONTENT : HttpStatus.OK);
 	}
 
+	/**
+	 * Method for find superhero by id.
+	 * 
+	 * @param id id of the superhero
+	 * @return superhero data
+	 * 
+	 * @throws SuperheroException exception of type {@link SuperheroException}
+	 */
 	@Duration
 	@GetMapping(path = "/superhero/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public SuperheroTO findById(@PathVariable("id") Long id) throws SuperheroException {
@@ -104,10 +131,24 @@ public class SuperherosController {
 
 	}
 
+	/**
+	 * 
+	 * Method for find all the superheroes by the name or a part of the name. It has
+	 * pagination and, by default, the size of each page is 3 records.
+	 * 
+	 * @param name       value of name
+	 * @param pageNumber number of page.
+	 * @param pageSize   size of page
+	 * 
+	 * @return map of the result
+	 * 
+	 * @throws SuperheroException exception of type {@link SuperheroException}
+	 */
 	@Duration
 	@GetMapping(path = "/superhero", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<String, Object>> findByName(@RequestParam("name") String name,
-			@RequestParam(defaultValue = "0") Short pageNumber, @RequestParam(defaultValue = "3") Short pageSize) throws SuperheroException {
+			@RequestParam(defaultValue = "0") Short pageNumber, @RequestParam(defaultValue = "3") Short pageSize)
+			throws SuperheroException {
 		LOGGER.info("START - findByName");
 
 		Page<SuperheroVO> result;
@@ -136,15 +177,23 @@ public class SuperherosController {
 				(supherList == null || supherList.isEmpty()) ? HttpStatus.NO_CONTENT : HttpStatus.OK);
 	}
 
+	/**
+	 * 
+	 * Method for update the superhero
+	 * 
+	 * @param superheroTO
+	 * 
+	 * @throws SuperheroException exception of type {@link SuperheroException}
+	 */
 	@Duration
 	@PutMapping(value = "/superhero", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public void update(@RequestBody @Valid SuperheroTO supher) throws SuperheroException {
+	public void update(@RequestBody @Valid SuperheroTO superheroTO) throws SuperheroException {
 		LOGGER.info("START - update");
 
 		try {
 
 			clearCache();
-			superherosService.update(superherosControllerMapper.transformToVO(supher));
+			superherosService.update(superherosControllerMapper.transformToVO(superheroTO));
 
 		} catch (SuperheroNotFoundException e) {
 			LOGGER.error(SUPERHERO_EXCEPTION, e);
@@ -158,6 +207,14 @@ public class SuperherosController {
 		LOGGER.info("END - update");
 	}
 
+	/**
+	 * 
+	 * Method for delete the superhero by id
+	 * 
+	 * @param id value of superhero
+	 * 
+	 * @throws SuperheroException exception of type {@link SuperheroException}
+	 */
 	@Duration
 	@DeleteMapping(value = "/superhero/{id}")
 	public void deleteById(@PathVariable(value = "id") Long id) throws SuperheroException {
@@ -176,6 +233,9 @@ public class SuperherosController {
 		LOGGER.info("END - deleteById");
 	}
 
+	/**
+	 * Method for clear the cache
+	 */
 	private void clearCache() {
 		for (String name : cacheManager.getCacheNames()) {
 			cacheManager.getCache(name).clear();

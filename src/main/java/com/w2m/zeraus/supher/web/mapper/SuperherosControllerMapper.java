@@ -10,6 +10,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import com.w2m.zeraus.supher.service.model.SuperheroVO;
 import com.w2m.zeraus.supher.web.model.SuperheroTO;
 
+/**
+ * 
+ * SuperherosController
+ * 
+ * @author employee zerausCo
+ *
+ */
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.WARN, imports = StandardCharsets.class)
 @Qualifier("superherosControllerMapper")
 public interface SuperherosControllerMapper {

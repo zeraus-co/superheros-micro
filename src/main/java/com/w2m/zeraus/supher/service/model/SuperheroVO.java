@@ -2,6 +2,13 @@ package com.w2m.zeraus.supher.service.model;
 
 import java.io.Serializable;
 
+/**
+ * 
+ * SuperheroVO Class
+ * 
+ * @author employee zerausCo
+ *
+ */
 public class SuperheroVO implements Serializable {
 
 	/** Attribute representing serialVersionUID */

@@ -10,6 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+/**
+ * 
+ * DurationLogger Class
+ * 
+ * @author employee zerausCo
+ *
+ */
 @Aspect
 @Component
 public class DurationLogger {
@@ -17,12 +24,16 @@ public class DurationLogger {
 
 	@Around("execution(* *(..)) && @annotation(com.w2m.zeraus.supher.utils.Duration)")
 	public Object log(ProceedingJoinPoint point) throws Throwable {
+		// Start of the operation
 		Date start = new Date();
 
+		// Method invocation
 		Object result = point.proceed();
 
+		// End of the operation
 		Date end = new Date();
 
+		// Calculate the duration of the operation
 		long duration = end.getTime() - start.getTime();
 
 		long hours = TimeUnit.MILLISECONDS.toHours(duration);
@@ -32,6 +43,7 @@ public class DurationLogger {
 
 		String durationSt = String.format("%02d:%02d:%02d,%03d", hours, minutes, seconds, milliseconds);
 		logger.info("Execution time = {}", durationSt);
+
 		return result;
 	}
 

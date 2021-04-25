@@ -12,6 +12,13 @@ import org.springframework.data.domain.PageImpl;
 import com.w2m.zeraus.supher.entity.Superhero;
 import com.w2m.zeraus.supher.service.model.SuperheroVO;
 
+/**
+ * 
+ * SuperherosServiceMapper
+ * 
+ * @author employee zerausCo
+ *
+ */
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.WARN, imports = StandardCharsets.class)
 @Qualifier("superherosServiceMapper")
 public interface SuperherosServiceMapper {
