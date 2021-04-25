@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.w2m.zeraus.supher.service.SuperherosService;
 import com.w2m.zeraus.supher.service.model.SuperheroVO;
+import com.w2m.zeraus.supher.utils.Duration;
 import com.w2m.zeraus.supher.web.mapper.SuperherosControllerMapper;
 import com.w2m.zeraus.supher.web.model.SuperheroTO;
 
@@ -35,6 +36,7 @@ public class SuperherosController {
 	@Autowired
 	private SuperherosControllerMapper superherosControllerMapper;
 
+	@Duration
 	@GetMapping(value = "/superheros", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<String, Object>> findAll(@RequestParam(defaultValue = "0") Short pageNumber,
 			@RequestParam(defaultValue = "3") Short pageSize) {
@@ -54,6 +56,7 @@ public class SuperherosController {
 		return new ResponseEntity<>(response, (supherList == null || supherList.isEmpty()) ? HttpStatus.NO_CONTENT : HttpStatus.OK);
 	}
 
+	@Duration
 	@GetMapping(path = "/superhero/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public SuperheroTO findById(@PathVariable("id") Long id) {
 		LOGGER.info("START - findById");
@@ -64,6 +67,7 @@ public class SuperherosController {
 		return response;
 	}
 
+	@Duration
 	@GetMapping(path = "/superhero", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<String, Object>> findByName(@RequestParam("name") String name, @RequestParam(defaultValue = "0") Short pageNumber,
 			@RequestParam(defaultValue = "3") Short pageSize) {
@@ -83,6 +87,7 @@ public class SuperherosController {
 		return new ResponseEntity<>(response, (supherList == null || supherList.isEmpty()) ? HttpStatus.NO_CONTENT : HttpStatus.OK);
 	}
 
+	@Duration
 	@PutMapping(value = "/superhero", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public void update(@RequestBody SuperheroTO supher) {
 		LOGGER.info("START - update");
@@ -92,6 +97,7 @@ public class SuperherosController {
 		LOGGER.info("END - update");
 	}
 
+	@Duration
 	@DeleteMapping(value = "/superhero/{id}")
 	public void deleteById(@PathVariable(value = "id") Long id) {
 		LOGGER.info("START - deleteById");
