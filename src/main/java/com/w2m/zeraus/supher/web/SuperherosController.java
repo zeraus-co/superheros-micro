@@ -1,4 +1,4 @@
-package com.w2m.zeraus.supher.controller;
+package com.w2m.zeraus.supher.web;
 
 import java.util.List;
 
@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.w2m.zeraus.supher.service.SuperherosService;
-import com.w2m.zeraus.supher.service.model.SuperheroVO;
+import com.w2m.zeraus.supher.web.mapper.SuperherosControllerMapper;
+import com.w2m.zeraus.supher.web.model.SuperheroTO;
 
 @RestController
 public class SuperherosController {
@@ -24,42 +25,45 @@ public class SuperherosController {
 
 	@Autowired
 	private SuperherosService superherosService;
+	
+	@Autowired
+	private SuperherosControllerMapper superherosControllerMapper;
 
 	@GetMapping(value = "/superheros", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<SuperheroVO> findAll() {
+	public List<SuperheroTO> findAll() {
 		LOGGER.info("START - findAll");
 
-		List<SuperheroVO> response = superherosService.findAll();
+		List<SuperheroTO> response = superherosControllerMapper.transformToTO(superherosService.findAll());
 
 		LOGGER.info("END - findAll");
 		return response;
 	}
 
 	@GetMapping(path = "/superhero/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public SuperheroVO findById(@PathVariable("id") Long id) {
+	public SuperheroTO findById(@PathVariable("id") Long id) {
 		LOGGER.info("START - findById");
 
-		SuperheroVO response = superherosService.findById(id);
+		SuperheroTO response = superherosControllerMapper.transformToTO(superherosService.findById(id));
 
 		LOGGER.info("END - findById");
 		return response;
 	}
 
 	@GetMapping(path = "/superhero", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<SuperheroVO> findByName(@RequestParam("name") String name) {
+	public List<SuperheroTO> findByName(@RequestParam("name") String name) {
 		LOGGER.info("START - findByName");
 
-		List<SuperheroVO> response = superherosService.findByName(name);
+		List<SuperheroTO> response = superherosControllerMapper.transformToTO(superherosService.findByName(name));
 
 		LOGGER.info("END - findByName");
 		return response;
 	}
 
 	@PutMapping(value = "/superhero", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public void update(@RequestBody SuperheroVO supher) {
+	public void update(@RequestBody SuperheroTO supher) {
 		LOGGER.info("START - update");
 
-		superherosService.update(supher);
+		superherosService.update(superherosControllerMapper.transformToVO(supher));
 
 		LOGGER.info("END - update");
 	}
