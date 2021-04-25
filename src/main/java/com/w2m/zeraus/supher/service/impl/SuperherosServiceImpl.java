@@ -1,11 +1,12 @@
 package com.w2m.zeraus.supher.service.impl;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -28,10 +29,11 @@ public class SuperherosServiceImpl implements SuperherosService {
 	private SuperherosServiceMapper superherosServiceMapper;
 
 	@Override
-	public List<SuperheroVO> findAll() {
+	public Page<SuperheroVO> findAll(Short pageNumber, Short pageSize) {
 		LOGGER.info("START - findAll");
 
-		List<SuperheroVO> response = superherosServiceMapper.transformToVO(superherosDao.findAll());
+		Page<SuperheroVO> response = superherosServiceMapper
+				.transformPageToVO(superherosDao.findAll(PageRequest.of(pageNumber.intValue(), pageSize.intValue())));
 
 		LOGGER.info("END - findAll");
 		return response;
@@ -54,12 +56,13 @@ public class SuperherosServiceImpl implements SuperherosService {
 	}
 
 	@Override
-	public List<SuperheroVO> findByName(String name) {
+	public Page<SuperheroVO> findByName(String nameValue, Short pageNumber, Short pageSize) {
 		LOGGER.info("START - findByName");
 
-		Specification<Superhero> filter = SpecificationsUtils.containsLike("name", name);
-		
-		List<SuperheroVO> response = superherosServiceMapper.transformToVO(superherosDao.findAll(filter));
+		Specification<Superhero> filter = SpecificationsUtils.containsLike("name", nameValue);
+
+		Page<SuperheroVO> response = superherosServiceMapper.transformPageToVO(
+				superherosDao.findAll(filter, PageRequest.of(pageNumber.intValue(), pageSize.intValue())));
 
 		LOGGER.info("END - findByName");
 		return response;

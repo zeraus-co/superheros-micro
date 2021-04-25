@@ -1,11 +1,16 @@
 package com.w2m.zeraus.supher.web;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.w2m.zeraus.supher.service.SuperherosService;
+import com.w2m.zeraus.supher.service.model.SuperheroVO;
 import com.w2m.zeraus.supher.web.mapper.SuperherosControllerMapper;
 import com.w2m.zeraus.supher.web.model.SuperheroTO;
 
@@ -25,18 +31,27 @@ public class SuperherosController {
 
 	@Autowired
 	private SuperherosService superherosService;
-	
+
 	@Autowired
 	private SuperherosControllerMapper superherosControllerMapper;
 
 	@GetMapping(value = "/superheros", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<SuperheroTO> findAll() {
+	public ResponseEntity<Map<String, Object>> findAll(@RequestParam(defaultValue = "0") Short pageNumber,
+			@RequestParam(defaultValue = "3") Short pageSize) {
 		LOGGER.info("START - findAll");
 
-		List<SuperheroTO> response = superherosControllerMapper.transformToTO(superherosService.findAll());
+		Page<SuperheroVO> result = superherosService.findAll(pageNumber, pageSize);
+
+		List<SuperheroTO> supherList = superherosControllerMapper.transformToTO(result.getContent());
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("supherList", supherList);
+		response.put("currentPage", result.getNumber());
+		response.put("totalPages", result.getTotalPages());
+		response.put("totalElements", result.getTotalElements());
 
 		LOGGER.info("END - findAll");
-		return response;
+		return new ResponseEntity<>(response, (supherList == null || supherList.isEmpty()) ? HttpStatus.NO_CONTENT : HttpStatus.OK);
 	}
 
 	@GetMapping(path = "/superhero/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -50,13 +65,22 @@ public class SuperherosController {
 	}
 
 	@GetMapping(path = "/superhero", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<SuperheroTO> findByName(@RequestParam("name") String name) {
+	public ResponseEntity<Map<String, Object>> findByName(@RequestParam("name") String name, @RequestParam(defaultValue = "0") Short pageNumber,
+			@RequestParam(defaultValue = "3") Short pageSize) {
 		LOGGER.info("START - findByName");
 
-		List<SuperheroTO> response = superherosControllerMapper.transformToTO(superherosService.findByName(name));
+		Page<SuperheroVO> result = superherosService.findByName(name, pageNumber, pageSize);
 
+		List<SuperheroTO> supherList = superherosControllerMapper.transformToTO(result.getContent());
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("supherList", supherList);
+		response.put("currentPage", result.getNumber());
+		response.put("totalPages", result.getTotalPages());
+		response.put("totalElements", result.getTotalElements());
+		
 		LOGGER.info("END - findByName");
-		return response;
+		return new ResponseEntity<>(response, (supherList == null || supherList.isEmpty()) ? HttpStatus.NO_CONTENT : HttpStatus.OK);
 	}
 
 	@PutMapping(value = "/superhero", consumes = MediaType.APPLICATION_JSON_VALUE)

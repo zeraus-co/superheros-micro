@@ -1,12 +1,12 @@
 package com.w2m.zeraus.supher;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.MethodOrderer;
@@ -20,6 +20,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.ResponseEntity;
 
+import com.w2m.zeraus.supher.service.model.SuperheroVO;
 import com.w2m.zeraus.supher.web.model.SuperheroTO;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -35,36 +36,67 @@ class SuperherosApplicationTest {
 	@Test
 	@Order(1)
 	void findAllTest() {
-		ResponseEntity<SuperheroTO[]> response = restTemplate.getForEntity("http://localhost:" + port + "/superheros",
-				SuperheroTO[].class);
+		Map<String, Object> response = (Map<String, Object>) restTemplate
+				.getForEntity("http://localhost:" + port + "/superheros", Map.class).getBody();
 
-		assertEquals(4, Arrays.asList(response.getBody()).size());
+		List<SuperheroVO> supherList = (List<SuperheroVO>) response.get("supherList");
+		assertNotNull(supherList);
+		assertEquals(3, supherList.size());
+		assertEquals(4, response.get("totalElements"));
 	}
 
 	@Test
 	@Order(2)
+	void findAllWithPaginationTest() {
+		Map<String, Object> response = (Map<String, Object>) restTemplate
+				.getForEntity("http://localhost:" + port + "/superheros?pageNumber=1&pageSize=3", Map.class).getBody();
+
+		List<SuperheroVO> supherList = (List<SuperheroVO>) response.get("supherList");
+		assertNotNull(supherList);
+		assertEquals(1, supherList.size());
+		assertEquals(4, response.get("totalElements"));
+	}
+
+	@Test
+	@Order(3)
 	void findByIdTest() {
 		Long id = 3L;
 
-		ResponseEntity<SuperheroTO> response = restTemplate.getForEntity("http://localhost:" + port + "/superhero/" + id,
-				SuperheroTO.class);
+		ResponseEntity<SuperheroTO> response = restTemplate
+				.getForEntity("http://localhost:" + port + "/superhero/" + id, SuperheroTO.class);
 
 		assertEquals(id, response.getBody().getId());
 	}
 
 	@Test
-	@Order(3)
+	@Order(4)
 	void findByNameTest() {
-		String name = "ana";
+		String nameValue = "an";
 
-		ResponseEntity<SuperheroTO[]> response = restTemplate
-				.getForEntity("http://localhost:" + port + "/superhero?name=" + name, SuperheroTO[].class);
+		Map<String, Object> response = (Map<String, Object>) restTemplate
+				.getForEntity("http://localhost:" + port + "/superhero?name=" + nameValue, Map.class).getBody();
 
-		assertTrue(Arrays.asList(response.getBody()).get(0).getName().contains(name));
+		List<SuperheroVO> supherList = (List<SuperheroVO>) response.get("supherList");
+		assertNotNull(supherList);
+		assertEquals(3, supherList.size());
+		assertEquals(3, response.get("totalElements"));
 	}
 
 	@Test
-	@Order(4)
+	@Order(5)
+	void findByNameWithPaginationTest() {
+		Map<String, Object> response = (Map<String, Object>) restTemplate
+				.getForEntity("http://localhost:" + port + "/superhero?name=an&pageNumber=1&pageSize=2", Map.class)
+				.getBody();
+
+		List<SuperheroVO> supherList = (List<SuperheroVO>) response.get("supherList");
+		assertNotNull(supherList);
+		assertEquals(1, supherList.size());
+		assertEquals(3, response.get("totalElements"));
+	}
+
+	@Test
+	@Order(6)
 	void updateTest() {
 		Long id = 3L;
 		ResponseEntity<SuperheroTO> supher = restTemplate.getForEntity("http://localhost:" + port + "/superhero/" + id,
@@ -76,20 +108,20 @@ class SuperherosApplicationTest {
 		params.put("id", "3");
 		restTemplate.put("http://localhost:" + port + "/superheros", supher, params);
 
-		ResponseEntity<SuperheroTO> response = restTemplate.getForEntity("http://localhost:" + port + "/superhero/" + id,
-				SuperheroTO.class);
+		ResponseEntity<SuperheroTO> response = restTemplate
+				.getForEntity("http://localhost:" + port + "/superhero/" + id, SuperheroTO.class);
 
 		assertEquals(id, response.getBody().getId());
 	}
 
 	@Test
-	@Order(5)
+	@Order(7)
 	void deleteByIdTest() {
 		Long id = 3L;
 		restTemplate.delete("http://localhost:" + port + "/superhero/" + id);
 
-		ResponseEntity<SuperheroTO> response = restTemplate.getForEntity("http://localhost:" + port + "/superhero/" + id,
-				SuperheroTO.class);
+		ResponseEntity<SuperheroTO> response = restTemplate
+				.getForEntity("http://localhost:" + port + "/superhero/" + id, SuperheroTO.class);
 
 		assertNull(response.getBody());
 	}

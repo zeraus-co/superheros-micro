@@ -1,16 +1,16 @@
 package com.w2m.zeraus.supher.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 import com.w2m.zeraus.supher.service.model.SuperheroVO;
 
 public interface SuperherosService {
 
-	public List<SuperheroVO> findAll();
+	public Page<SuperheroVO> findAll(Short pageNumber, Short pageSize);
 
 	public SuperheroVO findById(Long id);
 
-	public List<SuperheroVO> findByName(String name);
+	public Page<SuperheroVO> findByName(String name, Short pageNumber, Short pageSize);
 
 	public void update(SuperheroVO supher);
 
