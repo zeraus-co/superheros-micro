@@ -23,7 +23,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.w2m.zeraus.supher.exceptions.SuperheroErrors;
+import com.w2m.zeraus.supher.exceptions.SuperheroException;
 import com.w2m.zeraus.supher.service.SuperherosService;
+import com.w2m.zeraus.supher.service.exceptions.SuperheroNotFoundException;
 import com.w2m.zeraus.supher.service.model.SuperheroVO;
 import com.w2m.zeraus.supher.utils.Duration;
 import com.w2m.zeraus.supher.web.mapper.SuperherosControllerMapper;
@@ -33,6 +36,8 @@ import com.w2m.zeraus.supher.web.model.SuperheroTO;
 public class SuperherosController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SuperherosController.class);
+
+	private static final String SUPERHERO_EXCEPTION = "Superhero Exception";
 
 	@Autowired
 	private CacheManager cacheManager;
@@ -47,18 +52,27 @@ public class SuperherosController {
 	@Cacheable(cacheNames = "suphercache", condition = "#pageNumber == 0")
 	@GetMapping(value = "/superheros", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<String, Object>> findAll(@RequestParam(defaultValue = "0") Short pageNumber,
-			@RequestParam(defaultValue = "3") Short pageSize) {
+			@RequestParam(defaultValue = "3") Short pageSize) throws SuperheroException {
 		LOGGER.info("START - findAll");
 
-		Page<SuperheroVO> result = superherosService.findAll(pageNumber, pageSize);
-
-		List<SuperheroTO> supherList = superherosControllerMapper.transformToTO(result.getContent());
-
+		Page<SuperheroVO> result;
+		List<SuperheroTO> supherList;
 		Map<String, Object> response = new HashMap<>();
-		response.put("supherList", supherList);
-		response.put("currentPage", result.getNumber());
-		response.put("totalPages", result.getTotalPages());
-		response.put("totalElements", result.getTotalElements());
+
+		try {
+			result = superherosService.findAll(pageNumber, pageSize);
+
+			supherList = superherosControllerMapper.transformToTO(result.getContent());
+
+			response.put("supherList", supherList);
+			response.put("currentPage", result.getNumber());
+			response.put("totalPages", result.getTotalPages());
+			response.put("totalElements", result.getTotalElements());
+
+		} catch (Exception e) {
+			LOGGER.error(SUPERHERO_EXCEPTION, e);
+			throw new SuperheroException(SuperheroErrors.ERROR_CONTROLLER);
+		}
 
 		LOGGER.info("END - findAll");
 		return new ResponseEntity<>(response,
@@ -67,30 +81,55 @@ public class SuperherosController {
 
 	@Duration
 	@GetMapping(path = "/superhero/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public SuperheroTO findById(@PathVariable("id") Long id) {
+	public SuperheroTO findById(@PathVariable("id") Long id) throws SuperheroException {
 		LOGGER.info("START - findById");
 
-		SuperheroTO response = superherosControllerMapper.transformToTO(superherosService.findById(id));
+		SuperheroTO response = null;
+
+		try {
+
+			response = superherosControllerMapper.transformToTO(superherosService.findById(id));
+
+		} catch (SuperheroNotFoundException e) {
+			LOGGER.error(SUPERHERO_EXCEPTION, e);
+			throw new SuperheroException(SuperheroErrors.ERROR_NOT_FOUND);
+
+		} catch (Exception e) {
+			LOGGER.error(SUPERHERO_EXCEPTION, e);
+			throw new SuperheroException(SuperheroErrors.ERROR_CONTROLLER);
+		}
 
 		LOGGER.info("END - findById");
 		return response;
+
 	}
 
 	@Duration
 	@GetMapping(path = "/superhero", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<String, Object>> findByName(@RequestParam("name") String name,
-			@RequestParam(defaultValue = "0") Short pageNumber, @RequestParam(defaultValue = "3") Short pageSize) {
+			@RequestParam(defaultValue = "0") Short pageNumber, @RequestParam(defaultValue = "3") Short pageSize) throws SuperheroException {
 		LOGGER.info("START - findByName");
 
-		Page<SuperheroVO> result = superherosService.findByName(name, pageNumber, pageSize);
-
-		List<SuperheroTO> supherList = superherosControllerMapper.transformToTO(result.getContent());
-
+		Page<SuperheroVO> result;
+		List<SuperheroTO> supherList;
 		Map<String, Object> response = new HashMap<>();
-		response.put("supherList", supherList);
-		response.put("currentPage", result.getNumber());
-		response.put("totalPages", result.getTotalPages());
-		response.put("totalElements", result.getTotalElements());
+
+		try {
+
+			result = superherosService.findByName(name, pageNumber, pageSize);
+
+			supherList = superherosControllerMapper.transformToTO(result.getContent());
+
+			response = new HashMap<>();
+			response.put("supherList", supherList);
+			response.put("currentPage", result.getNumber());
+			response.put("totalPages", result.getTotalPages());
+			response.put("totalElements", result.getTotalElements());
+
+		} catch (Exception e) {
+			LOGGER.error(SUPERHERO_EXCEPTION, e);
+			throw new SuperheroException(SuperheroErrors.ERROR_CONTROLLER);
+		}
 
 		LOGGER.info("END - findByName");
 		return new ResponseEntity<>(response,
@@ -99,22 +138,40 @@ public class SuperherosController {
 
 	@Duration
 	@PutMapping(value = "/superhero", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public void update(@RequestBody @Valid SuperheroTO supher) {
+	public void update(@RequestBody @Valid SuperheroTO supher) throws SuperheroException {
 		LOGGER.info("START - update");
 
-		clearCache();
-		superherosService.update(superherosControllerMapper.transformToVO(supher));
+		try {
+
+			clearCache();
+			superherosService.update(superherosControllerMapper.transformToVO(supher));
+
+		} catch (SuperheroNotFoundException e) {
+			LOGGER.error(SUPERHERO_EXCEPTION, e);
+			throw new SuperheroException(SuperheroErrors.ERROR_NOT_FOUND);
+
+		} catch (Exception e) {
+			LOGGER.error(SUPERHERO_EXCEPTION, e);
+			throw new SuperheroException(SuperheroErrors.ERROR_CONTROLLER);
+		}
 
 		LOGGER.info("END - update");
 	}
 
 	@Duration
 	@DeleteMapping(value = "/superhero/{id}")
-	public void deleteById(@PathVariable(value = "id") Long id) {
+	public void deleteById(@PathVariable(value = "id") Long id) throws SuperheroException {
 		LOGGER.info("START - deleteById");
 
-		clearCache();
-		superherosService.deleteById(id);
+		try {
+
+			clearCache();
+			superherosService.deleteById(id);
+
+		} catch (Exception e) {
+			LOGGER.error(SUPERHERO_EXCEPTION, e);
+			throw new SuperheroException(SuperheroErrors.ERROR_CONTROLLER);
+		}
 
 		LOGGER.info("END - deleteById");
 	}

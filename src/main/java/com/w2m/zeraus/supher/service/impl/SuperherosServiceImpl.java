@@ -14,6 +14,7 @@ import com.w2m.zeraus.supher.entity.Superhero;
 import com.w2m.zeraus.supher.persistence.SuperherosDao;
 import com.w2m.zeraus.supher.persistence.utils.SpecificationsUtils;
 import com.w2m.zeraus.supher.service.SuperherosService;
+import com.w2m.zeraus.supher.service.exceptions.SuperheroNotFoundException;
 import com.w2m.zeraus.supher.service.mapper.SuperherosServiceMapper;
 import com.w2m.zeraus.supher.service.model.SuperheroVO;
 
@@ -40,16 +41,12 @@ public class SuperherosServiceImpl implements SuperherosService {
 	}
 
 	@Override
-	public SuperheroVO findById(Long id) {
+	public SuperheroVO findById(Long id) throws SuperheroNotFoundException {
 		LOGGER.info("START - findById");
 
-		Optional<Superhero> superhero = superherosDao.findById(id);
+		Superhero superhero = superherosDao.findById(id).orElseThrow(SuperheroNotFoundException::new);
 
-		SuperheroVO response = null;
-
-		if (superhero.isPresent()) {
-			response = superherosServiceMapper.transformToVO(superhero.get());
-		}
+		SuperheroVO response = superherosServiceMapper.transformToVO(superhero);
 
 		LOGGER.info("END - findById");
 		return response;
@@ -69,18 +66,16 @@ public class SuperherosServiceImpl implements SuperherosService {
 	}
 
 	@Override
-	public void update(SuperheroVO superheroVO) {
+	public void update(SuperheroVO superheroVO) throws SuperheroNotFoundException {
 		LOGGER.info("START - update");
 
-		Optional<Superhero> superhero = superherosDao.findById(superheroVO.getId());
+		Superhero superhero = superherosDao.findById(superheroVO.getId()).orElseThrow(SuperheroNotFoundException::new);
 
 		Superhero supher = null;
-		if (superhero.isPresent()) {
-			supher = superherosServiceMapper.transformToEntity(superheroVO);
-			supher.setCompany(superhero.get().getCompany());
-			
-			superherosDao.save(supher);
-		}
+		supher = superherosServiceMapper.transformToEntity(superheroVO);
+		supher.setCompany(superhero.getCompany());
+
+		superherosDao.save(supher);
 
 		LOGGER.info("END - update");
 	}

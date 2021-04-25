@@ -2,8 +2,6 @@ package com.w2m.zeraus.supher;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.w2m.zeraus.supher.service.model.SuperheroVO;
@@ -123,7 +122,7 @@ class SuperherosApplicationTest {
 		ResponseEntity<SuperheroTO> response = restTemplate
 				.getForEntity("http://localhost:" + port + "/superhero/" + id, SuperheroTO.class);
 
-		assertNull(response.getBody());
+		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
 	}
 
 }
