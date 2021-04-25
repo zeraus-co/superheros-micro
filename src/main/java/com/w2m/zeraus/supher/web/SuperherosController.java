@@ -7,6 +7,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,12 +33,16 @@ public class SuperherosController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SuperherosController.class);
 
 	@Autowired
+	private CacheManager cacheManager;
+
+	@Autowired
 	private SuperherosService superherosService;
 
 	@Autowired
 	private SuperherosControllerMapper superherosControllerMapper;
 
 	@Duration
+	@Cacheable(cacheNames = "suphercache", condition = "#pageNumber == 0")
 	@GetMapping(value = "/superheros", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<String, Object>> findAll(@RequestParam(defaultValue = "0") Short pageNumber,
 			@RequestParam(defaultValue = "3") Short pageSize) {
@@ -53,7 +59,8 @@ public class SuperherosController {
 		response.put("totalElements", result.getTotalElements());
 
 		LOGGER.info("END - findAll");
-		return new ResponseEntity<>(response, (supherList == null || supherList.isEmpty()) ? HttpStatus.NO_CONTENT : HttpStatus.OK);
+		return new ResponseEntity<>(response,
+				(supherList == null || supherList.isEmpty()) ? HttpStatus.NO_CONTENT : HttpStatus.OK);
 	}
 
 	@Duration
@@ -69,8 +76,8 @@ public class SuperherosController {
 
 	@Duration
 	@GetMapping(path = "/superhero", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Map<String, Object>> findByName(@RequestParam("name") String name, @RequestParam(defaultValue = "0") Short pageNumber,
-			@RequestParam(defaultValue = "3") Short pageSize) {
+	public ResponseEntity<Map<String, Object>> findByName(@RequestParam("name") String name,
+			@RequestParam(defaultValue = "0") Short pageNumber, @RequestParam(defaultValue = "3") Short pageSize) {
 		LOGGER.info("START - findByName");
 
 		Page<SuperheroVO> result = superherosService.findByName(name, pageNumber, pageSize);
@@ -82,9 +89,10 @@ public class SuperherosController {
 		response.put("currentPage", result.getNumber());
 		response.put("totalPages", result.getTotalPages());
 		response.put("totalElements", result.getTotalElements());
-		
+
 		LOGGER.info("END - findByName");
-		return new ResponseEntity<>(response, (supherList == null || supherList.isEmpty()) ? HttpStatus.NO_CONTENT : HttpStatus.OK);
+		return new ResponseEntity<>(response,
+				(supherList == null || supherList.isEmpty()) ? HttpStatus.NO_CONTENT : HttpStatus.OK);
 	}
 
 	@Duration
@@ -92,6 +100,7 @@ public class SuperherosController {
 	public void update(@RequestBody SuperheroTO supher) {
 		LOGGER.info("START - update");
 
+		clearCache();
 		superherosService.update(superherosControllerMapper.transformToVO(supher));
 
 		LOGGER.info("END - update");
@@ -102,9 +111,16 @@ public class SuperherosController {
 	public void deleteById(@PathVariable(value = "id") Long id) {
 		LOGGER.info("START - deleteById");
 
+		clearCache();
 		superherosService.deleteById(id);
 
 		LOGGER.info("END - deleteById");
+	}
+
+	private void clearCache() {
+		for (String name : cacheManager.getCacheNames()) {
+			cacheManager.getCache(name).clear();
+		}
 	}
 
 }

@@ -12,7 +12,7 @@ public interface SuperherosService {
 
 	public Page<SuperheroVO> findByName(String name, Short pageNumber, Short pageSize);
 
-	public void update(SuperheroVO supher);
+	public void update(SuperheroVO superheroVO);
 
 	public void deleteById(Long id);
 

@@ -69,10 +69,18 @@ public class SuperherosServiceImpl implements SuperherosService {
 	}
 
 	@Override
-	public void update(SuperheroVO supher) {
+	public void update(SuperheroVO superheroVO) {
 		LOGGER.info("START - update");
 
-		superherosDao.save(superherosServiceMapper.transformToEntity(supher));
+		Optional<Superhero> superhero = superherosDao.findById(superheroVO.getId());
+
+		Superhero supher = null;
+		if (superhero.isPresent()) {
+			supher = superherosServiceMapper.transformToEntity(superheroVO);
+			supher.setCompany(superhero.get().getCompany());
+			
+			superherosDao.save(supher);
+		}
 
 		LOGGER.info("END - update");
 	}
