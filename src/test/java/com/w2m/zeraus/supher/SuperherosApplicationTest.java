@@ -38,7 +38,7 @@ class SuperherosApplicationTest {
 
 		// Call to endpoint to find all
 		Map<String, Object> response = (Map<String, Object>) restTemplate
-				.getForEntity("http://localhost:" + port + "/superheros", Map.class).getBody();
+				.getForEntity("http://localhost:" + port + "/zeraus/superheros", Map.class).getBody();
 
 		// Check the result
 		List<SuperheroVO> supherList = (List<SuperheroVO>) response.get("supherList");
@@ -54,7 +54,8 @@ class SuperherosApplicationTest {
 
 		// Call method to find all with pagination
 		Map<String, Object> response = (Map<String, Object>) restTemplate
-				.getForEntity("http://localhost:" + port + "/superheros?pageNumber=1&pageSize=3", Map.class).getBody();
+				.getForEntity("http://localhost:" + port + "/zeraus/superheros?pageNumber=1&pageSize=3", Map.class)
+				.getBody();
 
 		// Check the result
 		List<SuperheroVO> supherList = (List<SuperheroVO>) response.get("supherList");
@@ -73,7 +74,7 @@ class SuperherosApplicationTest {
 
 		// Call method to find by id
 		ResponseEntity<SuperheroTO> response = restTemplate
-				.getForEntity("http://localhost:" + port + "/superhero/" + id, SuperheroTO.class);
+				.getForEntity("http://localhost:" + port + "/zeraus/superhero/" + id, SuperheroTO.class);
 
 		// Check the result
 		assertEquals(id, response.getBody().getId());
@@ -89,7 +90,7 @@ class SuperherosApplicationTest {
 
 		// Call method to find by name
 		Map<String, Object> response = (Map<String, Object>) restTemplate
-				.getForEntity("http://localhost:" + port + "/superhero?name=" + nameValue, Map.class).getBody();
+				.getForEntity("http://localhost:" + port + "/zeraus/superhero?name=" + nameValue, Map.class).getBody();
 
 		// Check the result
 		List<SuperheroVO> supherList = (List<SuperheroVO>) response.get("supherList");
@@ -104,9 +105,8 @@ class SuperherosApplicationTest {
 	void findByNameWithPaginationTest() {
 
 		// Call method to find by name with pagination
-		Map<String, Object> response = (Map<String, Object>) restTemplate
-				.getForEntity("http://localhost:" + port + "/superhero?name=an&pageNumber=1&pageSize=2", Map.class)
-				.getBody();
+		Map<String, Object> response = (Map<String, Object>) restTemplate.getForEntity(
+				"http://localhost:" + port + "/zeraus/superhero?name=an&pageNumber=1&pageSize=2", Map.class).getBody();
 
 		// Check the result
 		List<SuperheroVO> supherList = (List<SuperheroVO>) response.get("supherList");
@@ -123,19 +123,19 @@ class SuperherosApplicationTest {
 		Long id = 3L;
 
 		// Call method to find by id
-		ResponseEntity<SuperheroTO> supher = restTemplate.getForEntity("http://localhost:" + port + "/superhero/" + id,
-				SuperheroTO.class);
+		ResponseEntity<SuperheroTO> supher = restTemplate
+				.getForEntity("http://localhost:" + port + "/zeraus/superhero/" + id, SuperheroTO.class);
 
 		// Modify the name of super hero
 		supher.getBody().setName("Capitana");
 
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("id", "3");
-		restTemplate.put("http://localhost:" + port + "/superheros", supher, params);
+		restTemplate.put("http://localhost:" + port + "/zeraus/superheros", supher, params);
 
 		// Call method to find by id
 		ResponseEntity<SuperheroTO> response = restTemplate
-				.getForEntity("http://localhost:" + port + "/superhero/" + id, SuperheroTO.class);
+				.getForEntity("http://localhost:" + port + "/zeraus/superhero/" + id, SuperheroTO.class);
 
 		// Check the result
 		assertEquals(id, response.getBody().getId());
@@ -148,11 +148,11 @@ class SuperherosApplicationTest {
 
 		// Request data
 		Long id = 3L;
-		restTemplate.delete("http://localhost:" + port + "/superhero/" + id);
+		restTemplate.delete("http://localhost:" + port + "/zeraus/superhero/" + id);
 
 		// Call method to find by id
 		ResponseEntity<SuperheroTO> response = restTemplate
-				.getForEntity("http://localhost:" + port + "/superhero/" + id, SuperheroTO.class);
+				.getForEntity("http://localhost:" + port + "/zeraus/superhero/" + id, SuperheroTO.class);
 
 		// Check the result
 		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
