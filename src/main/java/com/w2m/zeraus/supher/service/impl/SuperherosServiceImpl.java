@@ -6,10 +6,12 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.w2m.zeraus.supher.entity.Superhero;
 import com.w2m.zeraus.supher.persistence.SuperherosDao;
+import com.w2m.zeraus.supher.persistence.utils.SpecificationsUtils;
 import com.w2m.zeraus.supher.service.SuperherosService;
 import com.w2m.zeraus.supher.service.mapper.SuperherosServiceMapper;
 import com.w2m.zeraus.supher.service.model.SuperheroVO;
@@ -55,7 +57,9 @@ public class SuperherosServiceImpl implements SuperherosService {
 	public List<SuperheroVO> findByName(String name) {
 		LOGGER.info("START - findByName");
 
-		List<SuperheroVO> response = superherosServiceMapper.transformToVO(superherosDao.findByName(name));
+		Specification<Superhero> filter = SpecificationsUtils.containsLike("name", name);
+		
+		List<SuperheroVO> response = superherosServiceMapper.transformToVO(superherosDao.findAll(filter));
 
 		LOGGER.info("END - findByName");
 		return response;
