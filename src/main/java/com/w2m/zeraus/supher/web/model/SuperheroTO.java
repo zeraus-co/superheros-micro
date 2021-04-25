@@ -2,15 +2,27 @@ package com.w2m.zeraus.supher.web.model;
 
 import java.io.Serializable;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
+import org.hibernate.validator.constraints.Length;
+
+@Valid
 public class SuperheroTO implements Serializable {
 
 	/** Attribute representing serialVersionUID */
 	private static final long serialVersionUID = 984656584348664090L;
 
+	@NotNull(message = "ID is required")
 	private Long id;
 
+	@NotNull(message = "Name is required")
+	@Length(max = 25, message = "The name must have maximum to 25 characters")
 	private String name;
 
+	@NotNull(message = "Gender is required")
+	@Pattern(regexp = "[M|F]", message = "The value must be M (Male) or F (Female)")
 	private String gender;
 
 	/**

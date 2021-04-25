@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +99,7 @@ public class SuperherosController {
 
 	@Duration
 	@PutMapping(value = "/superhero", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public void update(@RequestBody SuperheroTO supher) {
+	public void update(@RequestBody @Valid SuperheroTO supher) {
 		LOGGER.info("START - update");
 
 		clearCache();
